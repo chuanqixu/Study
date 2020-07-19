@@ -11,7 +11,7 @@ public class DebugExercise3 {
             int numAvailable = in.readInt();
             if (foodType.equals("turnip")) {
                 int newTotal = totalTurnips + numAvailable;
-                totalTurnips = newTotal;
+                totalTurnips = newTotal; /** Bug is overflow */
             }
             in.readLine();
         }

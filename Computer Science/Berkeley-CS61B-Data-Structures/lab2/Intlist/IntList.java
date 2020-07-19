@@ -1,3 +1,4 @@
+import javax.swing.text.html.InlineView;
 import java.util.Formatter;
 
 /**
@@ -79,10 +80,18 @@ public class IntList {
      * Returns a list consisting of the elements of A followed by the
      * *  elements of B.  May modify items of A. Don't use 'new'.
      */
-
     public static IntList dcatenate(IntList A, IntList B) {
         //TODO:  fill in method
-        return null;
+        //return null;
+        if (A==null) {
+            A=B;
+            return A;
+        }
+        IntList pointer = A;
+        while (pointer.rest!=null)
+            pointer = pointer.rest;
+        pointer.rest = B;
+        return A;
     }
 
     /**
@@ -91,7 +100,37 @@ public class IntList {
      */
     public static IntList catenate(IntList A, IntList B) {
         //TODO:  fill in method
-        return null;
+        //return null;
+
+        IntList head, tmp;
+        if (A!=null) {
+            head = new IntList(A.first,null);
+            tmp = head;
+            A = A.rest;
+            while (A != null) {
+                tmp.rest = new IntList(A.first, null);
+                tmp = tmp.rest;
+                A = A.rest;
+            }
+        }
+        else {
+            if (B==null) {
+                return null;
+            }
+            else {
+                head = new IntList(B.first,null);
+                tmp = head;
+                B = B.rest;
+            }
+        }
+
+        while (B != null) {
+            tmp.rest = new IntList(B.first, null);
+            tmp = tmp.rest;
+            B = B.rest;
+        }
+
+        return head;
     }
 
 
