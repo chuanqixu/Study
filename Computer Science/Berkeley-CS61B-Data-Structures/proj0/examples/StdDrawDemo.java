@@ -49,7 +49,7 @@ public class StdDrawDemo {
 		StdDraw.enableDoubleBuffering();
 
 		int waitTimeMilliseconds = 100;
-
+		StdDraw.setScale(-100, 100); //CS61B version's bug. Set the scale, or it will not display.
 		/* Stamp 100 additional pictures in random locations,
 		 * each one coming slightly faster than the one before. */
 		int count = 0;
@@ -85,6 +85,7 @@ public class StdDrawDemo {
 		  * offscreen canvas to the onscreen canvas, where it is displayed
 		  * in the standard drawing window. */
 		StdDraw.enableDoubleBuffering();
+		StdDraw.setScale(-250, 250); //CS61B version's bug. Set the scale, or it will not display.
 
 		double size = 100;
 		while (size < 500) {
@@ -107,8 +108,8 @@ public class StdDrawDemo {
 	public static void main(String[] args) {
 		/** Try commenting out some of these calls and
 		* notice the differences. */
-		drawThree();
+		//drawThree();
 		//drawRandom();
-		//drawZoom();
+		drawZoom();
 	}
 }
