@@ -1,16 +1,23 @@
 package creatures;
+
 import org.junit.Test;
+
 import static org.junit.Assert.*;
+
 import java.util.HashMap;
 import java.awt.Color;
+
 import huglife.Direction;
 import huglife.Action;
 import huglife.Occupant;
 import huglife.Impassible;
 import huglife.Empty;
+import org.knowm.xchart.internal.chartpart.Plot_;
 
-/** Tests the plip class
- *  @authr FIXME
+/**
+ * Tests the plip class
+ *
+ * @authr FIXME
  */
 
 public class TestPlip {
@@ -33,9 +40,14 @@ public class TestPlip {
     @Test
     public void testReplicate() {
         // TODO
+        Plip p = new Plip(2);
+        Plip offspring = p.replicate();
+        assertNotEquals(p, offspring);
+        assertEquals(1, p.energy(), 0.01);
+        assertEquals(1, offspring.energy(), 0.01);
     }
 
-    //@Test
+    @Test
     public void testChoose() {
 
         // No empty adjacent spaces; stay.

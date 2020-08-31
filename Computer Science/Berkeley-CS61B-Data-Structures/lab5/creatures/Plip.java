@@ -1,9 +1,12 @@
 package creatures;
 
+import edu.princeton.cs.algs4.StdRandom;
 import huglife.Creature;
 import huglife.Direction;
 import huglife.Action;
 import huglife.Occupant;
+
+import static huglife.HugLifeUtils.randomEntry;
 
 import java.awt.Color;
 import java.util.ArrayDeque;
@@ -57,7 +60,9 @@ public class Plip extends Creature {
      * that you get this exactly correct.
      */
     public Color color() {
-        g = 63;
+        r = 99;
+        b = 76;
+        g = (int) (96 * energy + 63);
         return color(r, g, b);
     }
 
@@ -75,6 +80,7 @@ public class Plip extends Creature {
      */
     public void move() {
         // TODO
+        energy = (energy > 0.15) ? (energy - 0.15) : 0;
     }
 
 
@@ -83,6 +89,7 @@ public class Plip extends Creature {
      */
     public void stay() {
         // TODO
+        energy = (energy > 1.8) ? 2 : (energy + 0.2);
     }
 
     /**
@@ -91,7 +98,8 @@ public class Plip extends Creature {
      * Plip.
      */
     public Plip replicate() {
-        return this;
+        energy *= 0.5;
+        return new Plip(energy);
     }
 
     /**
@@ -113,16 +121,31 @@ public class Plip extends Creature {
         boolean anyClorus = false;
         // TODO
         // (Google: Enhanced for-loop over keys of NEIGHBORS?)
-        // for () {...}
+        for (Map.Entry<Direction, Occupant> entry : neighbors.entrySet()) {
+            if (entry.getValue().name() == "empty") {
+                emptyNeighbors.add(entry.getKey());
+            } else if (entry.getValue().name() == "clorus") {
+                anyClorus = true;
+            }
+        }
 
-        if (false) { // FIXME
+        if (emptyNeighbors.size() == 0) { // FIXME
             // TODO
+            return new Action(Action.ActionType.STAY);
         }
 
         // Rule 2
         // HINT: randomEntry(emptyNeighbors)
+        if (energy >= 1) {
+            return new Action(Action.ActionType.REPLICATE, randomEntry(emptyNeighbors));
+        }
 
         // Rule 3
+        if (anyClorus) {
+            if (StdRandom.uniform(1) == 0) {
+                return new Action(Action.ActionType.MOVE, randomEntry(emptyNeighbors));
+            }
+        }
 
         // Rule 4
         return new Action(Action.ActionType.STAY);
