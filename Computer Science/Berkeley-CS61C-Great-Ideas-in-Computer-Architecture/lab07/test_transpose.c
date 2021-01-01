@@ -53,7 +53,7 @@ int main( int argc, char **argv ) {
     /* run tests */
     benchmark(A, B, n, blocksize, transpose_naive, "naive transpose");
     benchmark(A, B, n, blocksize, transpose_blocking, "transpose with blocking");
-
+    
     /* release resources */
     free( A );
     free( B );
