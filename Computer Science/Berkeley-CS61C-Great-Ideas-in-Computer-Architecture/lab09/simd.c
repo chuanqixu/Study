@@ -56,7 +56,7 @@ long long int sum_simd(int vals[NUM_ELEMS]) {
 		/* YOUR CODE GOES HERE */
 		__m128i _sum = _mm_setzero_si128();
 		for(unsigned int i = 0; i < NUM_ELEMS / 4 * 4; i += 4){
-			__m128i data = _mm_loadu_si128(vals+i);
+			__m128i data = _mm_loadu_si128((__m128i *) (vals+i));
 			_sum = _mm_add_epi32(_sum, _mm_and_si128(data, _mm_cmpgt_epi32(data, _127)));
 		}
 		/* You'll need a tail case. */
@@ -65,7 +65,7 @@ long long int sum_simd(int vals[NUM_ELEMS]) {
 				result += vals[i];
 			}
 		}
-		_mm_storeu_si128(final_data, _sum);
+		_mm_storeu_si128((__m128i *) (final_data), _sum);
 		for(unsigned int i = 0; i < 4; i++) {
 			result += final_data[i];
 		}
@@ -87,19 +87,19 @@ long long int sum_simd_unrolled(int vals[NUM_ELEMS]) {
 		/* MODIFY IT BY UNROLLING IT */
 		__m128i _sum = _mm_setzero_si128();
 		for(unsigned int i = 0; i < NUM_ELEMS / 16 * 4; i += 16){
-			__m128i data = _mm_loadu_si128(vals+i);
+			__m128i data = _mm_loadu_si128((__m128i *) (vals+i));
 			_sum = _mm_add_epi32(_sum, _mm_and_si128(data, _mm_cmpgt_epi32(data, _127)));
-			data = _mm_loadu_si128(vals+i+4);
+			data = _mm_loadu_si128((__m128i *) (vals+i+4));
 			_sum = _mm_add_epi32(_sum, _mm_and_si128(data, _mm_cmpgt_epi32(data, _127)));
-			data = _mm_loadu_si128(vals+i+8);
+			data = _mm_loadu_si128((__m128i *) (vals+i+8));
 			_sum = _mm_add_epi32(_sum, _mm_and_si128(data, _mm_cmpgt_epi32(data, _127)));
-			data = _mm_loadu_si128(vals+i+12);
+			data = _mm_loadu_si128((__m128i *) (vals+i+12));
 			_sum = _mm_add_epi32(_sum, _mm_and_si128(data, _mm_cmpgt_epi32(data, _127)));
 		}
 		
 		/* You'll need a tail case. */
 		for(unsigned int i = NUM_ELEMS / 16 * 4; i < NUM_ELEMS / 4 * 4; i += 4){
-			__m128i data = _mm_loadu_si128(vals+i);
+			__m128i data = _mm_loadu_si128((__m128i *) (vals+i));
 			_sum = _mm_add_epi32(_sum, _mm_and_si128(data, _mm_cmpgt_epi32(data, _127)));
 		}
 		for(unsigned int i = NUM_ELEMS / 4 * 4; i < NUM_ELEMS; i++) {
@@ -107,7 +107,7 @@ long long int sum_simd_unrolled(int vals[NUM_ELEMS]) {
 				result += vals[i];
 			}
 		}
-		_mm_storeu_si128(final_data, _sum);
+		_mm_storeu_si128((__m128i *) (final_data), _sum);
 		for(unsigned int i = 0; i < 4; i++) {
 			result += final_data[i];
 		}
