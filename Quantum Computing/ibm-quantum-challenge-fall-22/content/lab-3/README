@@ -1,0 +1,2 @@
+Because there are updates in lab3 to fix the error (they import VQE from qiskit instead of qiskit-runtime).
+Please check the notebook in './lab3-runtime-fix' directory to find the answers.
