@@ -1,6 +1,6 @@
 # IBM Quantum Challenge Fall 2022
 
-_Note: This is not the official repository for this code camp but my own repository created when I solving the challenges._
+_Note: This is not the official repository for this code camp but my own repository created when I was solving the challenges._
 
 _Please check the [Official Repository](https://github.com/qiskit-community/ibm-quantum-challenge-fall-22)._
 

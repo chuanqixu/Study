@@ -1,6 +1,6 @@
 # PennyLane Code Camp 2022
 
-_Note: This is not the official repository for this code camp but my own repository created when I solving the challenges._
+_Note: This is not the official repository for this code camp but my own repository created when I was solving the challenges._
 
 Time: 1st Nov. 2022 -- 21st Nov. 2022
 
