@@ -6,7 +6,7 @@ Repository for my study materials
 
 ### Courses
 
-* [Berkeley CS61C: Great Ideas in Computer Architecture Fall 2020](Berkeley-CS61C-Great-Ideas-in-Computer-Architecture/)
+* [Berkeley CS61C: Great Ideas in Computer Architecture Fall 2020](Computer%20Science/Berkeley-CS61C-Great-Ideas-in-Computer-Architecture/)
 
     Computer Organization and Architecture.
 
@@ -15,7 +15,7 @@ Repository for my study materials
 
 ### Code Camps
 
-* [PennyLane Code Camp 2022](pennylane-code-camp-2022/)
+* [PennyLane Code Camp 2022](Quantum%20Computing/pennylane-code-camp-2022/)
     * Time: 2022/11/01 - 2022/11/21
     * Introduction to [PennyLane](https://pennylane.ai/) usage. There are 5 problems in this code camp:
         * 1: Differentiable ZNE
@@ -24,7 +24,7 @@ Repository for my study materials
         * 4: Quantum Transforms and Noise
         * 5: Universality: U3 and CNOT Decomposition
 
-* [IBM Quantum Challenge Fall 2022](ibm-quantum-challenge-fall-22/)
+* [IBM Quantum Challenge Fall 2022](Quantum%20Computing/ibm-quantum-challenge-fall-22/)
     * Time: 2022/11/11 - 2022/11/18
     * Quick overview of the usage of Qiskit Runtime [Sampler](https://qiskit.org/documentation/partners/qiskit_ibm_runtime/stubs/qiskit_ibm_runtime.Sampler.html#sampler) and [Estimator](https://qiskit.org/documentation/partners/qiskit_ibm_runtime/stubs/qiskit_ibm_runtime.Estimator.html#estimator). In addition, apply them to quantum kernel learning, quantum optimization, and quantum chemistry.
 
