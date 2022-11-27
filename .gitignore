@@ -1,0 +1,5 @@
+# git ignore for Stanford CS106X: Programming Abstractions in C++ 2019 Fall
+Computer\ Science/Stanford-CS106X-Programming-Abstractions-in-C++-2019-Fall/CS106/CS106.pro.user
+Computer\ Science/Stanford-CS106X-Programming-Abstractions-in-C++-2019-Fall/build-CS106-Desktop_Qt_6_4_1_MinGW_64_bit-Debug/
+Computer\ Science/Stanford-CS106X-Programming-Abstractions-in-C++-2019-Fall/CodeStepByStep/*/*.exe
+# *.exe
