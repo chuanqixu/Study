@@ -13,7 +13,7 @@ Before starting, Qt needs to be installed. I found that the code provided in the
 
 2. Use the 32-bit toolchain instead of the 64-bit. The projects cannot be built when I used 64-bit.
 
-# The Stanford libcs106 library
+#### The Stanford C++ Libraries
 
-Stanford implements a library to replace some of the C++ standard libraries used to simplify the development process for their C++ courses. The Stanford libcs106 library is recommended and widely used in these assignments. [The Stanford libcs106 library Documentation](https://web.stanford.edu/dept/cs_edu/resources/cslib_docs/) needs to be frequently referred to when doing these assignments.
+Stanford implements a library to replace some of the C++ standard libraries used to simplify the development process for their C++ courses. The Stanford C++ Libraries are recommended and widely used in these assignments. [The Stanford C++ Libraries documentation](http://www.martinstepp.com/cppdoc/) need to be frequently referred to when doing these assignments.
 

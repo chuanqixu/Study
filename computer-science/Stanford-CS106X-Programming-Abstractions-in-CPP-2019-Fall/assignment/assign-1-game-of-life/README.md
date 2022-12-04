@@ -2,7 +2,7 @@
 
 [Assignment description](./05-Assignment-1-Life.pdf)
 
-Implement [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life#:~:text=The%20Game%20of%20Life%2C%20also,state%2C%20requiring%20no%20further%20input.). In this assignment, you will get familiar with `grid`, a class in `Stanford libcs106 library` that is similar to built-in arrays.
+Implement [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life#:~:text=The%20Game%20of%20Life%2C%20also,state%2C%20requiring%20no%20further%20input.). In this assignment, you will get familiar with `grid`, a class in `The Stanford C++ Libraries` that is similar to built-in arrays.
 
    First, need to create a random grid or read from files according to the rules.
 
@@ -22,8 +22,8 @@ The grid is created and stored in the heap, and the pointer to the grid will be 
 
 In the assignment description, it is required to provide 2 methods to generate the grid.
 
-1. Randomly generate the grid: this can be done with [Stanford `libcs106` random.h](https://web.stanford.edu/dept/cs_edu/resources/cslib_docs/random.html) modules. [`randomInteger(low, high)`](https://web.stanford.edu/dept/cs_edu/resources/cslib_docs/random.html#Function:randomInteger) is used to randomly specify the number of rows and columns of the grid, and also used to specify ages of cells. [`randomBool()`](https://web.stanford.edu/dept/cs_edu/resources/cslib_docs/random.html#Function:randomBool) is used to specify whether to a cell should be occupied.
-2. Read from data files: a number of data files can be found in `res/files`. Because how to specify ages is not mentioned, I still used [`randomInteger(1, kMaxAge)`]((https://web.stanford.edu/dept/cs_edu/resources/cslib_docs/random.html#Function:randomInteger)) for cells that are occupied. One thing that needs to be noticed is the file path in Windows, which will be discussed in the next section.
+1. Randomly generate the grid: this can be done with [The Stanford C++ Libraries random.h](http://www.martinstepp.com/cppdoc/random.html) modules. [`randomInteger(low, high)`](http://www.martinstepp.com/cppdoc/random.html#Function:randomInteger) is used to randomly specify the number of rows and columns of the grid, and also used to specify ages of cells. [`randomBool()`](http://www.martinstepp.com/cppdoc/random.html#Function:randomBool) is used to specify whether to a cell should be occupied.
+2. Read from data files: a number of data files can be found in `res/files`. Because how to specify ages is not mentioned, I still used [`randomInteger(1, kMaxAge)`](http://www.martinstepp.com/cppdoc/random.html#Function:randomInteger) for cells that are occupied. One thing that needs to be noticed is the file path in Windows, which will be discussed in the next section.
 
 ## File Path in Windows
 
@@ -63,7 +63,7 @@ In this section, I implemented 3 functions:
    1. I switched two input pointers, so that `before` always points to the grid representing the current generation. The reason is that in `run_animate()`, we can only call `advance_grid()` to get a new generation without any other operations. Because of needing to change the pointer, we should pass by reference.
    2. Actually, the second argument, i.e., the pointer pointing to the grid that stores the intermediate values, is not needed. It can be a local variable in `advance_grid()`. However, this needs to call the constructor and destructor in every step, which is not efficient.
 2. `print_grid()`: needs to use functionalities in `life-graphics.h`. Please check the details in this file.
-3. `run_animate()`: to implement this function, a little knowledge of event-driven programming is needed. In the handout, it gives an example of how to do the task of checking the timer event and the mouse event. Related functionalities are implemented in `gevent.h`.
+3. `run_animate()`: to implement this function, a little knowledge of event-driven programming is needed. In the handout, it gives an example of how to do the task of checking the timer event and the mouse event. Related functionalities are implemented in [`gevent.h`](http://www.martinstepp.com/cppdoc/gevent.html).
     ```cpp
     static void runAnimation(LifeDisplay& display, Grid<int>& board, int ms) {
         GTimer timer(ms);
