@@ -29,7 +29,7 @@ Before starting, Qt needs to be installed. I found that the code provided in the
 
 #### The Stanford C++ Libraries
 
-Stanford implements a library to replace some of the C++ standard libraries used to simplify the development process for their C++ courses. The Stanford C++ Libraries are recommended and widely used in these assignments. [The Stanford C++ Libraries documentation](http://www.martinstepp.com/cppdoc/) need to be frequently referred to when doing these assignments.
+Stanford implements a library to replace some of the C++ standard libraries used to simplify the development process for their C++ courses. The Stanford C++ Libraries are recommended and widely used in these assignments. [The Stanford C++ Libraries documentation](http://www.martinstepp.com/cppdoc/) needs to be frequently referred to when doing these assignments.
 
 
 ### Assignment Description
@@ -51,3 +51,9 @@ The second one is the projects. Because non-Stanford students cannot access the 
 
    Second, generate the next generation according to the rules of Conway's Game of Life, and display them in a window. Besides, basic user interface interactions need to be implemented, such as the timer or mouse control.
 
+2. [Abstract Data Types (ADTs)](https://en.wikipedia.org/wiki/Abstract_data_type)
+
+    This assignment includes three parts:
+    1. Word ladder: A simple application of [breadth-first search (BFS)](https://en.wikipedia.org/wiki/Breadth-first_search) to search for intermediate English words that can transform one English word to another by changing only one character each time.
+    2. Random maze generator: A simple application of [Kruskal's algorithm](https://en.wikipedia.org/wiki/Kruskal%27s_algorithm) that randomly generates a route from the entrance to the exit in a square maze.
+    3. Random sentence generator: Given a sentence consisting of nonterminals (sentences that can be expanded by randomly choosing from predefined sentences), expand it to a sentence.
