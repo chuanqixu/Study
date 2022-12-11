@@ -57,3 +57,9 @@ The second one is the projects. Because non-Stanford students cannot access the 
     1. Word ladder: A simple application of [breadth-first search (BFS)](https://en.wikipedia.org/wiki/Breadth-first_search) to search for intermediate English words that can transform one English word to another by changing only one character each time.
     2. Random maze generator: A simple application of [Kruskal's algorithm](https://en.wikipedia.org/wiki/Kruskal%27s_algorithm) that randomly generates a route from the entrance to the exit in a square maze.
     3. Random sentence generator: Given a sentence consisting of nonterminals (sentences that can be expanded by randomly choosing from predefined sentences), expand it to a sentence.
+
+3. The Game of [Boggle](https://en.wikipedia.org/wiki/Boggle).
+
+    This assignment implements a game named [Boggle](https://en.wikipedia.org/wiki/Boggle).
+
+    The main part of this assignment is to use recursion to find all possible English words that are longer than 4 letters in the boggle.
