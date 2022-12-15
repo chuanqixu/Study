@@ -58,8 +58,17 @@ The second one is the projects. Because non-Stanford students cannot access the 
     2. Random maze generator: A simple application of [Kruskal's algorithm](https://en.wikipedia.org/wiki/Kruskal%27s_algorithm) that randomly generates a route from the entrance to the exit in a square maze.
     3. Random sentence generator: Given a sentence consisting of nonterminals (sentences that can be expanded by randomly choosing from predefined sentences), expand it to a sentence.
 
-3. The Game of [Boggle](https://en.wikipedia.org/wiki/Boggle).
+3. The Game of [Boggle](https://en.wikipedia.org/wiki/Boggle)
 
     This assignment implements a game named [Boggle](https://en.wikipedia.org/wiki/Boggle).
 
     The main part of this assignment is to use recursion to find all possible English words that are longer than 4 letters in the boggle.
+
+4. Assignment 4: ADTs and [Recursion](https://en.wikipedia.org/wiki/Recursion)
+
+    This assignment implements three recursive problems:
+
+   1. Doctors Without Orders: assign patients to doctors. Each patient has the required hours, and each doctor works for a number of hours. This problem is similar to assigning a series of short line segments to a series of long line segments.
+   2. Disaster Preparation: find a set of nodes in a graph where they and their adjacent nodes can cover the whole graph.
+   3. Winning the Presidency: dynamic programming but uses recursions instead of loops. Similar to [knapsack problem](https://en.wikipedia.org/wiki/Knapsack_problem).
+
