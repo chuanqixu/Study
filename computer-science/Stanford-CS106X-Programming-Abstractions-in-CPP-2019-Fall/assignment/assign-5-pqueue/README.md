@@ -2,7 +2,12 @@
 
 [Assignment description](./25-Assignment-5-PQueue.pdf).
 
-This assignment implements three recursive problems:
+This assignment uses 4 data structures to implement the priority queue:
+
+1. Unsorted vector
+2. Binary heap
+3. Sorted doubly linked list
+4. [Binomial heap](https://en.wikipedia.org/wiki/Binomial_heap)
 
 
 
