@@ -73,9 +73,12 @@ The second one is the projects. Because non-Stanford students cannot access the 
 5. Implementation of [Priority Queue](https://en.wikipedia.org/wiki/Priority_queue) ([Assignment description](assignment/assign-5-pqueue/25-Assignment-5-PQueue.pdf))
 
     This assignment uses 4 data structures to implement the priority queue:
+
     1. Unsorted vector
     2. Binary heap
     3. Sorted doubly linked list
     4. [Binomial heap](https://en.wikipedia.org/wiki/Binomial_heap)
 
+6. [Huffman Coding](https://en.wikipedia.org/wiki/Huffman_coding) ([Assignment description](./29-Assignment-6-Huffman.pdf))
 
+    This assignment implements the Huffman coding.
