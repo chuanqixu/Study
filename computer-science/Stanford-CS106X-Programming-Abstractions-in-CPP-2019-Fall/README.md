@@ -79,6 +79,11 @@ The second one is the projects. Because non-Stanford students cannot access the 
     3. Sorted doubly linked list
     4. [Binomial heap](https://en.wikipedia.org/wiki/Binomial_heap)
 
-6. [Huffman Coding](https://en.wikipedia.org/wiki/Huffman_coding) ([Assignment description](./29-Assignment-6-Huffman.pdf))
+6. [Huffman Coding](https://en.wikipedia.org/wiki/Huffman_coding) ([Assignment description](assignment/assign-6-huffman/29-Assignment-6-Huffman.pdf))
 
     This assignment implements the Huffman coding.
+
+7. Stanford 1-2-3 ([Assignment description](assignment/assign-7-stanford-123/32-Assignment-7-Stanford-1-2-3.pdf))
+
+    This assignment implements a simple spreadsheet, like Microsoft Excel. I only implement the version without dependencies.
+
