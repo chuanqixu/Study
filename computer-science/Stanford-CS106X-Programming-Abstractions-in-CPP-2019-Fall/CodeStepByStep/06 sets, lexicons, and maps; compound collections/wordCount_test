@@ -1,0 +1,1 @@
+Write a function named wordCount that accepts a file name as a parameter and opens that file and that returns a count of the number of unique words in the file. Do not worry about capitalization and punctuation; for example, "Hello" and "hello" and "hello!!" are different words for this problem. Use a set as auxiliary storage.
