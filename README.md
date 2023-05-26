@@ -32,3 +32,6 @@ Repository for my study materials
     * Time: 2022/11/11 - 2022/11/18
     * Quick overview of the usage of Qiskit Runtime [Sampler](https://qiskit.org/documentation/partners/qiskit_ibm_runtime/stubs/qiskit_ibm_runtime.Sampler.html#sampler) and [Estimator](https://qiskit.org/documentation/partners/qiskit_ibm_runtime/stubs/qiskit_ibm_runtime.Estimator.html#estimator). In addition, apply them to quantum kernel learning, quantum optimization, and quantum chemistry.
 
+* [IBM Quantum Challenge Spring 2023](quantum-computing/ibm-quantum-challenge-spring-23/)
+    * Time: 2023/05/17 - 2023/05/24
+    * This year’s Challenge focuses on [Dynamic Circuits](https://quantum-computing.ibm.com/services/programs/docs/runtime/manage/systems/dynamic-circuits/introduction), a technology that makes it easier to run more advanced quantum algorithms.
