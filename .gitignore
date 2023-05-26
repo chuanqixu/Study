@@ -1,0 +1,10 @@
+# General
+.vscode
+
+# Stanford CS106X
+computer-science/Stanford-CS106X-Programming-Abstractions-in-CPP-2019-Fall/**/build-**
+computer-science/Stanford-CS106X-Programming-Abstractions-in-CPP-2019-Fall/**/*.pro.user
+
+# Stanford CS106L
+computer-science/Stanford-CS106L-Standard-CPP-Programming-2020-Winter/**/build-**
+computer-science/Stanford-CS106L-Standard-CPP-Programming-2020-Winter/cpp_test*
