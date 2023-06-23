@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="https://fav.farm/🔥" />
+</head>
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="City or State">
+    <ul class="suggestions">
+      <li>Filter for a city</li>
+      <li>or a state</li>
+    </ul>
+  </form>
+<script>
+const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+
+let cities = [];
+
+fetch(endpoint).then(response => response.json()).then(data => cities = data);
+
+function find(query) {
+  return cities.filter(city => city["city"].toLowerCase().includes(query) || city["state"].includes(query));
+}
+
+const form = document.querySelector(".search-form");
+const input = document.querySelector("input");
+
+input.addEventListener("keyup", event => {
+  let ul = document.querySelector(".suggestions");
+  form.removeChild(ul);
+
+  ul = document.createElement("ul");
+  ul.className = "suggestions";
+  form.appendChild(ul);
+
+  const query = event.target.value.toLowerCase();
+  if (!query) {
+    let li = document.createElement("li");
+    li.appendChild(document.createTextNode("Filter for a city"));
+    ul.appendChild(li);
+    li = document.createElement("li");
+    li.appendChild(document.createTextNode("or a state"));
+    ul.appendChild(li);
+  } else {
+    const filtered_cities = find(query);
+    filtered_cities.forEach(city => {
+      const li = document.createElement("li");
+
+      const name = document.createElement("span");
+      name.className = "name";
+      name.appendChild(document.createTextNode(city["city"] + ", " + city["state"]));
+      li.appendChild(name);
+
+      const population = document.createElement("span");
+      population.className = "population";
+      population.appendChild(document.createTextNode(city["population"]));
+      li.appendChild(population);
+
+      ul.appendChild(li);
+    });
+  }
+});
+
+</script>
+</body>
+</html>
