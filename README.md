@@ -39,3 +39,7 @@ Repository for my study materials
 * [IBM Quantum Challenge Spring 2023](quantum-computing/ibm-quantum-challenge-spring-23/)
     * Time: 2023/05/17 - 2023/05/24
     * This year’s Challenge focuses on [Dynamic Circuits](https://quantum-computing.ibm.com/services/programs/docs/runtime/manage/systems/dynamic-circuits/introduction), a technology that makes it easier to run more advanced quantum algorithms.
+
+* [Qiskit Global Summer School 2023:Theory To Implementation](quantum-computing/qiskit-global-summer-school-2023/)
+    * Time: 2023/07/17 - 2023/07/28
+    * The [Qiskit Global Summer School 2023](https://qiskit.org/events/summer-school-2023) is a two-week intensive summer program designed to empower the quantum researchers and developers of tomorrow with the know-how to explore the world of quantum computing, as well as refresh and sharpen the industry professional's skills. This fourth-annual summer school will focus foundationally on quantum computing by taking a back-to-basics approach, with a look at making the transition from theory to implementation.
