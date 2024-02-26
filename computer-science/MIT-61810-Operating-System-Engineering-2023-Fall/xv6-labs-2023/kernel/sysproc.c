@@ -5,6 +5,7 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "sysinfo.h"
 
 uint64
 sys_exit(void)
@@ -102,6 +103,32 @@ sys_trace(void)
 
   struct proc* calling_proc = myproc();
   calling_proc->trace_mask = n;
+
+  return 0;
+}
+
+uint64
+sys_sysinfo(void)
+{
+  /*
+  even though the argument is the address of the sysinfo structure of the user's program,
+  we cannot directly assign to it since the address is in the va space of the user, but 
+  here we are in the kernel, so we must use copyout
+  */
+
+  int addr;
+  argint(0, &addr);
+
+  // uint64 freemem = info_kfree(), nproc = info_nproc();
+
+  struct proc *p = myproc();
+  struct sysinfo si;
+
+  si.freemem = info_kfree();
+  si.nproc = info_nproc();
+
+  if(copyout(p->pagetable, addr, (char *)&si, sizeof(si)) < 0)
+    return -1;
 
   return 0;
 }
