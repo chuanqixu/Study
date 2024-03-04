@@ -75,6 +75,16 @@ int
 sys_pgaccess(void)
 {
   // lab pgtbl: your code here.
+  pagetable_t pagetable = myproc()->pagetable;
+
+  uint64 base, mask;
+  int len;
+  argaddr(0, &base);
+  argint(1, &len);
+  argaddr(2, &mask);
+
+  uvmpgaccess(pagetable, (void *) base, len, (void *) mask);
+
   return 0;
 }
 #endif

@@ -468,3 +468,32 @@ void vmprint(pagetable_t pagetable, int level) {
     }
   }
 }
+
+int uvmpgaccess(pagetable_t pagetable, void *base, int len, void *mask) {
+  uint64 va = (uint64) base;
+  if(va >= MAXVA)
+    panic("uvmpgaccess");
+
+  uint64 buf[MAX_PGACCESS / 64] = {0}; // one uint64 for 64 page tables
+
+  // use walk is not efficient since it calls walk for every page table and 
+  // does not use space ajacency of the page table
+  // however, it is tedious to implement the round up scheme, so here I still
+  // use walk
+  for (int i = 0; i < len; ++i) {
+    pte_t *pte = walk(pagetable, va, 0);
+    printf("%p\n", pte);
+    if (*pte & PTE_A) {
+      *pte &= (~PTE_A);
+      buf[i / 64] |= (1L << (i % 64));
+    }
+    va += PGSIZE;
+  }
+
+  if (copyout(pagetable, (uint64) mask, (char *) buf, len / 8) < 0) {
+    panic("uvmpgaccess: copyout to user space");
+    return -1;
+  }
+
+  return 0;
+}
