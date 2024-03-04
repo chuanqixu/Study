@@ -202,6 +202,31 @@ proc_pagetable(struct proc *p)
     return 0;
   }
 
+
+  // lab page tables: speed up system calls
+  #ifdef LAB_PGTBL
+
+  // allocate one page at USYSCALL
+  uint64 *pa = (uint64 *) kalloc();
+  if (pa == 0 || mappages(pagetable, USYSCALL, PGSIZE,
+              (uint64) pa, PTE_R | PTE_U) < 0){
+    if (pa != 0) {
+      kfree(pa);
+    }
+    uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+    uvmunmap(pagetable, TRAPFRAME, 1, 0);
+    uvmfree(pagetable, 0);
+    return 0;
+  }
+
+  // store pid at the newly allocated page
+  // cannot use copyout, because it requires the memory to be writable:
+  // if(pte == 0 || (*pte & PTE_V) == 0 || (*pte & PTE_U) == 0 ||
+  //     (*pte & PTE_W) == 0)
+  //    return -1;
+  *pa  = p->pid;
+  #endif
+
   return pagetable;
 }
 
@@ -212,6 +237,14 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
 {
   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
   uvmunmap(pagetable, TRAPFRAME, 1, 0);
+
+  // lab page tables: speed up system calls
+  #ifdef LAB_PGTBL
+  // set do_free to 1 unless there is memory leakage, i.e., the kalloc() page will not be freed
+  // if not, cannot pass the `badarg` test
+  uvmunmap(pagetable, USYSCALL, 1, 1);
+  #endif
+
   uvmfree(pagetable, sz);
 }
 
