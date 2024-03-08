@@ -122,11 +122,7 @@ panic(char *s)
   printf("panic: ");
   printf(s);
   printf("\n");
-
-  printf("\nbacktrace:\n");
-  backtrace();
-
-  panicked = 1; // freeze uart output from other CPUs  
+  panicked = 1; // freeze uart output from other CPUs
   for(;;)
     ;
 }
@@ -136,38 +132,4 @@ printfinit(void)
 {
   initlock(&pr.lock, "pr");
   pr.locking = 1;
-}
-
-void backtrace() {
-  // backtrace note down the calling stacks inside the kernel and cannot do with the user calling stacks
-
-  // user call system calls through system call handles in the user space (user/user.h) -> trampoline (kernel/trampoline.S)
-  //                -> usertrap (kernel/trap.c) -> syscall (kernel/syscall.c) -> specific system call
-
-  // s0 stores the address of the beginning of each function call, and its return address may be stored in (s0 - 8)
-  // (if no function call, it may be optimized), and the previous s0 is stored in (s0 - 16)
-
-  // the first calling happens in the user space from the running function to the system call handle, which changes ra to the 
-  // following instruction of that function
-  // then it calls 'ecall' and jumps to trampoline, which does not change the value in ra; however, sp is changed to kernel sp,
-  // which points to the start of the kernel stack
-  // then it jumps to usertrap (it is jr not jlr, so it does not save ra)
-
-  // so in the last stack frame, its saved ra is the return address of the user virtual address (in this lab, it is 0x12),
-  // and its saved s0 is the kernel stack address of that process (in this lab, it is 0x0000003fffffa000)
-  // because the stack is growing downward, and it happens to be map into another page, so it can be used as one way to find the last stack frame
-
-  struct proc *p = myproc();
-  uint64 s0 = r_fp();
-  
-  while (s0 != p->trapframe->kernel_sp) {
-    uint64 ra = *((uint64 *) (s0 - 8));
-    printf("%p\n", ra);
-    s0 = *((uint64 *) (s0 - 16));
-  }
-
-  // alternative way to determine whether it is the last frame
-  // uint64 page = PGROUNDDOWN(s0);
-  // while (PGROUNDDOWN(s0) == page) {
-  // }
 }
