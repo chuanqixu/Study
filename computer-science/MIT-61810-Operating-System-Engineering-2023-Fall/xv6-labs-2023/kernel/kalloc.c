@@ -23,10 +23,18 @@ struct {
   struct run *freelist;
 } kmem;
 
+// lab copy-on-write
+char refs[REF_COUNT] = {0}; // stores the reference count for each physical page; since NPROC is defined as 64 in param.h, use char is enough
+struct spinlock cow_lock; // must set the lock, otherwise will lead to concurrency issue
+
 void
 kinit()
 {
   initlock(&kmem.lock, "kmem");
+  initlock(&cow_lock, "cow");
+  for (uint64 i = 0; i < REF_COUNT; ++i) {
+    refs[i] = 1;
+  }
   freerange(end, (void*)PHYSTOP);
 }
 
@@ -51,15 +59,25 @@ kfree(void *pa)
   if(((uint64)pa % PGSIZE) != 0 || (char*)pa < end || (uint64)pa >= PHYSTOP)
     panic("kfree");
 
-  // Fill with junk to catch dangling refs.
-  memset(pa, 1, PGSIZE);
+  acquire(&cow_lock);
+  char *idx_p = &refs[PA_IDX((uint64) pa)];
+  if (*idx_p > 0) {
+    --(*idx_p);
+  }
+  release(&cow_lock);
 
-  r = (struct run*)pa;
+  if (*idx_p == 0) {
+    // Fill with junk to catch dangling refs.
+    memset(pa, 1, PGSIZE);
 
-  acquire(&kmem.lock);
-  r->next = kmem.freelist;
-  kmem.freelist = r;
-  release(&kmem.lock);
+    r = (struct run*)pa;
+
+    acquire(&kmem.lock);
+    r->next = kmem.freelist;
+    kmem.freelist = r;
+    release(&kmem.lock);
+  }
+
 }
 
 // Allocate one 4096-byte page of physical memory.
@@ -72,8 +90,12 @@ kalloc(void)
 
   acquire(&kmem.lock);
   r = kmem.freelist;
-  if(r)
+  if(r) {
     kmem.freelist = r->next;
+    acquire(&cow_lock);
+    refs[PA_IDX((uint64) r)] = 1;
+    release(&cow_lock);
+  }
   release(&kmem.lock);
 
   if(r)
