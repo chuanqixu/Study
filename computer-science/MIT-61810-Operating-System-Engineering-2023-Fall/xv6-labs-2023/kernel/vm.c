@@ -15,9 +15,6 @@ extern char etext[];  // kernel.ld sets this to end of kernel code.
 
 extern char trampoline[]; // trampoline.S
 
-extern char refs[REF_COUNT];
-extern struct spinlock cow_lock;
-
 // Make a direct-map page table for the kernel.
 pagetable_t
 kvmmake(void)
@@ -318,7 +315,7 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
   pte_t *pte;
   uint64 pa, i;
   uint flags;
-  // char *mem;
+  char *mem;
 
   for(i = 0; i < sz; i += PGSIZE){
     if((pte = walk(old, i, 0)) == 0)
@@ -327,29 +324,19 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
       panic("uvmcopy: page not present");
     pa = PTE2PA(*pte);
     flags = PTE_FLAGS(*pte);
-
-    // if read-only, do nothing; otherwise, clear write bit and set the cow bit
-    if (flags & PTE_W) {
-      flags = (flags & (~PTE_W)) | PTE_COW;
-      *pte = (*pte & (~PTE_W)) | PTE_COW;
+    if((mem = kalloc()) == 0)
+      goto err;
+    memmove(mem, (char*)pa, PGSIZE);
+    if(mappages(new, i, PGSIZE, (uint64)mem, flags) != 0){
+      kfree(mem);
+      goto err;
     }
-    // if((mem = kalloc()) == 0)
-    //   goto err;
-    // memmove(mem, (char*)pa, PGSIZE);
-    if(mappages(new, i, PGSIZE, pa, flags) != 0){
-      panic("uvmcopy: cannot map parent's physical page into the child");
-      // kfree(mem);
-      // goto err;
-    }
-    acquire(&cow_lock);
-    ++refs[PA_IDX(pa)];
-    release(&cow_lock);
   }
   return 0;
 
-//  err:
-//   uvmunmap(new, 0, i / PGSIZE, 1);
-//   return -1;
+ err:
+  uvmunmap(new, 0, i / PGSIZE, 1);
+  return -1;
 }
 
 // mark a PTE invalid for user access.
@@ -380,14 +367,8 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
       return -1;
     pte = walk(pagetable, va0, 0);
     if(pte == 0 || (*pte & PTE_V) == 0 || (*pte & PTE_U) == 0 ||
-       ((*pte & PTE_W) == 0 && ((*pte & PTE_COW) == 0)))
+       (*pte & PTE_W) == 0)
       return -1;
-
-    if ((*pte & PTE_W) == 0) { // is cow page
-      if (cow(pagetable, va0) < 0) {
-        return -1;
-      }
-    }
     pa0 = PTE2PA(*pte);
     n = PGSIZE - (dstva - va0);
     if(n > len)
@@ -467,71 +448,4 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
   } else {
     return -1;
   }
-}
-
-int cow(pagetable_t pagetable, uint64 va) {
-  // recommend not to use panic, will cause the test to freeze
-
-  if(va >= MAXVA)
-    return -1;
-
-  uint64 pa;
-  pte_t *pte;
-
-  if((pte = walk(pagetable, va, 0)) == 0)
-    return -1;
-    // panic("cow: pte should exist");
-  if((*pte & PTE_V) == 0)
-    return -1;
-    // panic("cow: page not present");
-  if(*pte & PTE_W)
-    return -1;
-    // panic("cow: page is writable");
-
-  if (*pte & PTE_COW) { // if originally writable
-    pa = PTE2PA(*pte);
-    char *mem;
-    if((mem = kalloc()) == 0) {
-      return -1;
-      // panic("cow: cannot allocate memory for page fault");
-    }
-    memmove(mem, (char*)pa, PGSIZE);
-    kfree((char *) pa);
-    *pte = (PA2PTE(mem) | PTE_FLAGS(*pte) | PTE_W) & (~PTE_COW);
-
-    // one optimization is something like below
-    // because when the reference count is 1, we do not need to allocate a new page
-    // but instead we can only set write bit for this page
-
-    // however, this requires a careful multiprocessing design to realize it:
-    // when ref count is examined to be 1, if no lock, the process may be interupted,
-    // and some other process may be in the middle of uvmcopy without adding the reference count but changed page flags
-    // in this case, it will lead to error that one page table has write bit for the cow page
-
-    // on the other hand, if make reference count addition in uvmcopy to be before setting the flag, it may lead to the
-    // error that referene count is larger than 1 but the page is still writable
-
-    // char *idx_p = &refs[PA_IDX((uint64) pa)];
-    // if (*idx_p > 1) { // if ref count > 1, should allocate new page
-    //   char *mem;
-    //   if((mem = kalloc()) == 0) {
-    //     return -1;
-    //     // panic("cow: cannot allocate memory for page fault");
-    //   }
-    //   memmove(mem, (char*)pa, PGSIZE);
-    //   kfree((char *) pa);
-    //   // below is not correct, since there may be two processes entering this point with reference count to be 2
-    //   // so neither of them will free this page, and in the end, one page is lost
-    //   // acquire(&cow_lock);
-    //   // --(*idx_p);
-    //   // release(&cow_lock);
-    //   *pte = (PA2PTE(mem) | PTE_FLAGS(*pte) | PTE_W) & (~PTE_COW);
-    // } else { // if ref count == 1, only need to set the write bit
-    //   *pte = (*pte |PTE_W) & (~PTE_COW);
-    // }
-  } else { // store to a read-only page
-    return -1;
-  }
-
-  return 0;
 }

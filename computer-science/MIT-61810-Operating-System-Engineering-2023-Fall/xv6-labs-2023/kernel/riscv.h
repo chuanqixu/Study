@@ -361,15 +361,3 @@ typedef uint64 *pagetable_t; // 512 PTEs
 // Sv39, to avoid having to sign-extend virtual addresses
 // that have the high bit set.
 #define MAXVA (1L << (9 + 9 + 9 + 12 - 1))
-
-
-
-// lab copy-on-write
-
-// below can optimize a bit, but somehow leads to some bugs
-// #define REF_COUNT ((PHYSTOP - KERNBASE) / PGSIZE) // number of items in the array storing the reference count for each physical page
-// #define PA_IDX(pa) (((pa) - KERNBASE) >> 12) //get the index in the array
-
-#define REF_COUNT (PHYSTOP / PGSIZE) // number of items in the array storing the reference count for each physical page
-#define PA_IDX(pa) ((pa) >> 12) //get the index in the array
-#define PTE_COW (1L << 8) // bit to show whether the page is copy-on-write page; only originally writable page will be set
