@@ -17,6 +17,8 @@ struct entry *table[NBUCKET];
 int keys[NKEYS];
 int nthread = 1;
 
+// lab: using threads
+pthread_mutex_t locks[NBUCKET];
 
 double
 now()
@@ -52,7 +54,9 @@ void put(int key, int value)
     e->value = value;
   } else {
     // the new is new.
+    pthread_mutex_lock(&locks[i]);
     insert(key, value, &table[i], table[i]);
+    pthread_mutex_unlock(&locks[i]);
   }
 
 }
@@ -67,7 +71,6 @@ get(int key)
   for (e = table[i]; e != 0; e = e->next) {
     if (e->key == key) break;
   }
-
   return e;
 }
 
@@ -98,6 +101,13 @@ get_thread(void *xa)
   return NULL;
 }
 
+// lab: using threads
+void init_locks() {
+  for (int i = 0; i < NBUCKET; ++i) {
+    pthread_mutex_init(&locks[i], NULL);
+  }
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -105,6 +115,8 @@ main(int argc, char *argv[])
   void *value;
   double t1, t0;
 
+  // lab: using threads
+  init_locks(locks);
 
   if (argc < 2) {
     fprintf(stderr, "Usage: %s nthreads\n", argv[0]);
