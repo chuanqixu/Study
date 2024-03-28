@@ -19,15 +19,14 @@ struct run {
 };
 
 struct {
-  struct spinlock locks[NCPU];
-  struct run *freelists[NCPU];
+  struct spinlock lock;
+  struct run *freelist;
 } kmem;
 
 void
 kinit()
 {
-  for (int i = 0; i < NCPU; ++i)
-    initlock(&kmem.locks[i], "kmem");
+  initlock(&kmem.lock, "kmem");
   freerange(end, (void*)PHYSTOP);
 }
 
@@ -57,14 +56,10 @@ kfree(void *pa)
 
   r = (struct run*)pa;
 
-  push_off();
-  int i_cpu = cpuid();
-  pop_off();
-
-  acquire(&kmem.locks[i_cpu]);
-  r->next = kmem.freelists[i_cpu];
-  kmem.freelists[i_cpu] = r;
-  release(&kmem.locks[i_cpu]);
+  acquire(&kmem.lock);
+  r->next = kmem.freelist;
+  kmem.freelist = r;
+  release(&kmem.lock);
 }
 
 // Allocate one 4096-byte page of physical memory.
@@ -75,45 +70,11 @@ kalloc(void)
 {
   struct run *r;
 
-  push_off();
-  int i_cpu = cpuid();
-  pop_off();
-
-  acquire(&kmem.locks[i_cpu]);
-  r = kmem.freelists[i_cpu];
-  if(r) {
-    kmem.freelists[i_cpu] = r->next;
-    release(&kmem.locks[i_cpu]);
-  } else {
-    // here I only implement to steal one page from the other process
-    // it can also be implemented to steal many pages, maybe it is faster
-
-    // acquire locks with ascending indices to keep the global lock order and protect from deadlock
-    // so first release the lock
-    release(&kmem.locks[i_cpu]);
-    for (int i = 0; i < NCPU; ++i) {
-      if (i == i_cpu) continue;
-
-      int i_small = i < i_cpu ? i : i_cpu, i_large = i > i_cpu ? i : i_cpu;
-      acquire(&kmem.locks[i_small]);
-      acquire(&kmem.locks[i_large]);
-      if (kmem.freelists[i] == 0) {
-        release(&kmem.locks[i_large]);
-        release(&kmem.locks[i_small]);
-        continue;
-      }
-
-      // because between release and acquire above, the thread does not hold any lock
-      // now the freelist may not be empty, but it does not matter because we only steal one page
-      r = kmem.freelists[i];
-      kmem.freelists[i] = kmem.freelists[i]->next;
-      r->next = 0;
-
-      release(&kmem.locks[i_large]);
-      release(&kmem.locks[i_small]);
-      break;
-    }
-  }
+  acquire(&kmem.lock);
+  r = kmem.freelist;
+  if(r)
+    kmem.freelist = r->next;
+  release(&kmem.lock);
 
   if(r)
     memset((char*)r, 5, PGSIZE); // fill with junk
