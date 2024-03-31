@@ -349,29 +349,6 @@ sys_open(void)
     return -1;
   }
 
-  if (ip->type == T_SYMLINK && (omode & O_NOFOLLOW) == 0) {
-    int depth = 0;
-    while (ip->type == T_SYMLINK) {
-      if (depth > 10 || readi(ip, 0, (uint64) path, 0, sizeof(path)) != sizeof(path)) {
-        iunlockput(ip);
-        myproc()->ofile[fd] = 0;
-        fileclose(f);
-        end_op();
-        return -1;
-      }
-      iunlockput(ip);
-
-      ++depth;
-      if ((ip = namei(path)) == 0) {
-        myproc()->ofile[fd] = 0;
-        fileclose(f);
-        end_op();
-        return -1;
-      }
-      ilock(ip);
-    }
-  }
-
   if(ip->type == T_DEVICE){
     f->type = FD_DEVICE;
     f->major = ip->major;
@@ -524,36 +501,5 @@ sys_pipe(void)
     fileclose(wf);
     return -1;
   }
-  return 0;
-}
-
-uint64 sys_symlink(void) {
-  char name[DIRSIZ], target[MAXPATH], path[MAXPATH];
-  struct inode *dp, *ip;
-
-  if(argstr(0, target, MAXPATH) < 0 || argstr(1, path, MAXPATH) < 0)
-    return -1;
-
-  begin_op();
-
-  if((dp = nameiparent(path, name)) == 0) {
-    end_op();
-    return -1;
-  }
-
-  if ((ip = create(path, T_SYMLINK, dp->major, dp->minor)) == 0) {
-    end_op();
-    return -1;
-  }
-
-  if(writei(ip, 0, (uint64) target, 0, sizeof(target)) != sizeof(target)) {
-    iunlockput(ip);
-    end_op();
-    return -1;
-  }
-
-  iunlockput(ip);
-  end_op();
-
   return 0;
 }
