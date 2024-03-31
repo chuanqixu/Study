@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "fcntl.h"
 
 struct cpu cpus[NCPU];
 
@@ -288,6 +289,15 @@ fork(void)
     return -1;
   }
 
+  //copy VMA
+  memmove(&np->vma, &p->vma, sizeof(p->vma));
+  for (int i = 0; i < MAX_VMA; ++i) {
+    struct vma *vma = &(np->vma)[i];
+    if (vma->valid) {
+      filedup(vma->f);
+    }
+  }
+
   // Copy user memory from parent to child.
   if(uvmcopy(p->pagetable, np->pagetable, p->sz) < 0){
     freeproc(np);
@@ -357,6 +367,31 @@ exit(int status)
       struct file *f = p->ofile[fd];
       fileclose(f);
       p->ofile[fd] = 0;
+    }
+  }
+
+  // munmap
+  for (int i = 0; i < MAX_VMA; ++i) {
+    struct vma *vma = &(p->vma)[i];
+    if (vma->valid) {
+      uint64 va = vma->addr_curr_start;
+      // munmap page may not be allocated due to lazy-allocation
+      // need to check whether the page is allocated
+      pte_t *pte;
+      int allocated = 0;
+      if ((pte = walk(p->pagetable, va, 0)) != 0 && (*pte & PTE_V) != 0)
+        allocated = 1;
+
+      // write back to the file and unmap the page table
+      if (allocated) {
+        if (vma->flags & MAP_SHARED)
+          munmap_filewrite(vma->f, va, va - vma->addr, vma->len);
+        uvmunmap(p->pagetable, va, vma->len / PGSIZE, 1);
+      }
+
+      // update vma
+      vma->valid = 0;
+      fileclose(vma->f);
     }
   }
 

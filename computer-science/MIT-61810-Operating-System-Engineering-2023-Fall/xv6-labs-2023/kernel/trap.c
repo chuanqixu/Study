@@ -6,6 +6,10 @@
 #include "proc.h"
 #include "defs.h"
 
+#include "sleeplock.h"
+#include "fs.h"
+#include "file.h"
+
 struct spinlock tickslock;
 uint ticks;
 
@@ -65,6 +69,47 @@ usertrap(void)
     intr_on();
 
     syscall();
+  } else if (r_scause() == 13 || r_scause() == 15) {
+    // page fault for VMA
+    int i = 0;
+    for (; i < MAX_VMA; ++i) {
+      struct vma *vma = &(p->vma)[i];
+      uint64 va = PGROUNDDOWN(r_stval());
+      if (vma->valid && vma->addr <= va && vma->addr_curr_start + vma->len > va) {
+        uint64 pa;
+        if ((pa = (uint64) kalloc()) == 0)
+          break;
+
+        int flag = vma->prot << 1 | PTE_U;
+        kvmmap(p->pagetable, va, pa, PGSIZE, flag);
+
+        // kalloc set initial value in the allocated memory to be 5
+        // but mmaptest requires the memory to be 0
+        memset((char *) pa, 0, PGSIZE);
+
+        struct file *f = vma->f;
+        ilock(f->ip);
+        readi(f->ip, 0, pa, va - vma->addr, PGSIZE);
+
+        // should not use below, because the file size may not be multiples of PGSIZE
+        // will lead to infinite loops
+        // if (readi(f->ip, 0, pa, va - vma->addr, PGSIZE) != PGSIZE) {
+        //   iunlock(f->ip);
+        //   uvmunmap(p->pagetable, va, 1, 1);
+        //   break;
+        // }
+
+        iunlock(f->ip);
+        break;
+      }
+    }
+
+    // page fault is not due to unmapped VMA
+    if (i == MAX_VMA) {
+      printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
+      printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
+      setkilled(p);
+    }
   } else if((which_dev = devintr()) != 0){
     // ok
   } else {

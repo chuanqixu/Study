@@ -34,6 +34,8 @@ int pgaccess(void *base, int len, void *mask);
 // usyscall region
 int ugetpid(void);
 #endif
+void *mmap(void *addr, int len, int prot, int flags, int fd, int offset);
+int munmap(void *addr, int len);
 
 // ulib.c
 int stat(const char*, struct stat*);

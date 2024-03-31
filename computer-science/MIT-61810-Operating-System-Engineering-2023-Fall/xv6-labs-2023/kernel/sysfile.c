@@ -503,3 +503,104 @@ sys_pipe(void)
   }
   return 0;
 }
+
+uint64 sys_mmap(void) {
+  uint64 addr;
+  int len, prot, flags, fd, offset;
+  struct file *f;
+  
+  argaddr(0, &addr);
+  argint(1, &len);
+  argint(2, &prot);
+  argint(3, &flags);
+  argfd(4, &fd, &f);
+  argint(5, &offset);
+
+  // map_private can be set with any prot
+  // map_shared must be compatible with the file's flags
+  if (flags & MAP_SHARED && ((prot & PROT_READ && !f->readable) || (prot & PROT_WRITE && !f->writable)))
+    return -1;
+
+  len = PGROUNDUP(len);
+
+  struct proc *p = myproc();
+
+  // update VMA
+  for (int i = 0; i < MAX_VMA; ++i) {
+    struct vma *vma = &(p->vma)[i];
+    if (vma->valid == 0) {
+      vma->addr = p->sz;
+      vma->addr_curr_start = p->sz;
+      vma->valid = 1;
+      vma->len = len;
+      vma->prot = prot;
+      vma->flags = flags;
+      vma->f = f;
+      vma->offset = offset;
+
+      p->sz += len;
+
+      filedup(f);
+
+      return vma->addr;
+    }
+  }
+
+  return -1;
+}
+
+uint64 sys_munmap(void) {
+  uint64 addr;
+  int len;
+
+  argaddr(0, &addr);
+  argint(1, &len);
+
+  uint64 va = PGROUNDDOWN(addr);
+  len = PGROUNDUP(addr - va + len);
+
+  struct proc *p = myproc();
+
+  // munmap page may not be allocated due to lazy-allocation
+  // need to check whether the page is allocated
+  pte_t *pte;
+  int allocated = 0;
+  if ((pte = walk(p->pagetable, va, 0)) != 0 && (*pte & PTE_V) != 0)
+    allocated = 1;
+
+  int i = 0;
+  for (; i < MAX_VMA; ++i) {
+    struct vma *vma = &(p->vma)[i];
+    if (vma->valid && vma->addr <= va && vma->addr_curr_start + vma->len > va) {
+      if (vma->len < len)
+        len = vma->len;
+
+      // write back to the file and unmap the page table
+      if (allocated) {
+        if (vma->flags & MAP_SHARED)
+          munmap_filewrite(vma->f, va, va - vma->addr, len);
+        uvmunmap(p->pagetable, va, len / PGSIZE, 1);
+      }
+
+      // update vma
+      // the lab assumes that it will either unmap at the start, or at the end, or the whole region
+      if (vma->addr_curr_start == va) {
+        vma->addr_curr_start += len;
+      } else if (vma->addr_curr_start + vma->len != va + len) {
+        return -1;
+      }
+      vma->len -= len;
+
+      if (vma->len == 0) {
+        vma->valid = 0;
+        fileclose(vma->f);
+      }
+
+      break;
+    }
+  }
+  if (i == MAX_VMA)
+    return -1;
+
+  return 0;
+}
