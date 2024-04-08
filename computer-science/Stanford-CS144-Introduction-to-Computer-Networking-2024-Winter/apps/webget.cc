@@ -13,20 +13,20 @@ void get_URL( const string& host, const string& path )
   // cerr << "Warning: get_URL() has not been implemented yet.\n";
 
   TCPSocket tcp_socket;
-  tcp_socket.connect(Address(host, "http"));
+  tcp_socket.connect( Address( host, "http" ) );
 
   string cmd;
-  cmd += string("GET ") + path + string(" HTTP/1.1\r\n");
-  cmd += string("Host: ") + host + string("\r\n");
-  cmd += string("Connection: close\r\n");
-  cmd += string("\r\n");
+  cmd += string( "GET " ) + path + string( " HTTP/1.1\r\n" );
+  cmd += string( "Host: " ) + host + string( "\r\n" );
+  cmd += string( "Connection: close\r\n" );
+  cmd += string( "\r\n" );
 
-  tcp_socket.write(cmd);
-  tcp_socket.shutdown(SHUT_WR);
+  tcp_socket.write( cmd );
+  tcp_socket.shutdown( SHUT_WR );
 
   string recv_str, curr_str;
-  while (!tcp_socket.eof()) {
-    tcp_socket.read(curr_str);
+  while ( !tcp_socket.eof() ) {
+    tcp_socket.read( curr_str );
     recv_str += curr_str;
   }
 
