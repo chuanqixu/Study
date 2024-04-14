@@ -13,19 +13,17 @@ bool Writer::is_closed() const
 void Writer::push( string data )
 {
   // Your code here.
-  if ( is_closed() )
+  uint64_t avail_cap = available_capacity(), len = min( avail_cap, data.length() );
+  if ( len == 0 || is_closed() )
     return;
 
-  uint64_t len = available_capacity() < data.length() ? available_capacity() : data.length();
-  if ( len == 0 )
-    return;
-
-  // prevent overflow
-  for ( uint64_t i = 0; i < len - 1; ++i ) {
-    data_.push_back( data[i] );
+  if ( data.length() < avail_cap ) {
+    buffer_.push_back( std::move( data ) );
+  } else {
+    buffer_.push_back( data.substr( 0, avail_cap ) );
   }
-  data_.push_back( data[len - 1] );
 
+  bytes_buffered_ += len;
   bytes_count_write_ += len;
 }
 
@@ -38,7 +36,7 @@ void Writer::close()
 uint64_t Writer::available_capacity() const
 {
   // Your code here.
-  return capacity_ - data_.size();
+  return capacity_ - bytes_buffered_;
 }
 
 uint64_t Writer::bytes_pushed() const
@@ -50,7 +48,7 @@ uint64_t Writer::bytes_pushed() const
 bool Reader::is_finished() const
 {
   // Your code here.
-  return data_.empty() && closed_;
+  return buffer_.empty() && closed_;
 }
 
 uint64_t Reader::bytes_popped() const
@@ -69,8 +67,8 @@ string_view Reader::peek() const
   // if create a new string and return, the new string will be destroyed when the function returns, so string_view
   // will have the stack-use-after-return error
 
-  if ( !data_.empty() ) {
-    return std::string_view( &data_.front(), 1 );
+  if ( !buffer_.empty() ) {
+    return std::string_view( buffer_.front() );
   } else {
     return std::string_view();
   }
@@ -79,24 +77,29 @@ string_view Reader::peek() const
 void Reader::pop( uint64_t len )
 {
   // Your code here.
-  if ( is_finished() )
-    return;
 
-  len = data_.size() < len ? data_.size() : len;
+  // not necessary since if is_finished() is true, len = 0
+  // if ( is_finished() )
+  //   return;
 
-  // prevent overflow
-  if ( len == 0 )
-    return;
-  for ( uint64_t i = 0; i < len - 1; ++i ) {
-    data_.pop_front();
-  }
-  data_.pop_front();
-
+  len = min( bytes_buffered_, len );
   bytes_count_read_ += len;
+  bytes_buffered_ -= len;
+
+  while ( len > 0 ) {
+    uint64_t front_length = buffer_.front().length();
+    if ( len < front_length ) {
+      buffer_.front().erase( 0, len );
+      return;
+    } else {
+      len -= front_length;
+      buffer_.pop_front();
+    }
+  }
 }
 
 uint64_t Reader::bytes_buffered() const
 {
   // Your code here.
-  return data_.size();
+  return bytes_buffered_;
 }

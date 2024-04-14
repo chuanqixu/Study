@@ -28,8 +28,8 @@ protected:
   bool error_ {};
 
   bool closed_ = false;
-  std::deque<char> data_ {};
-  uint64_t bytes_count_write_ = 0, bytes_count_read_ = 0;
+  std::deque<std::string> buffer_ {};
+  uint64_t bytes_buffered_ = 0, bytes_count_write_ = 0, bytes_count_read_ = 0;
 };
 
 class Writer : public ByteStream
