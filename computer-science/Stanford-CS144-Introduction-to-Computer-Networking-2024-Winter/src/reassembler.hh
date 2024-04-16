@@ -1,6 +1,8 @@
 #pragma once
 
 #include "byte_stream.hh"
+#include <map>
+#include <set>
 
 class Reassembler
 {
@@ -42,4 +44,27 @@ public:
 
 private:
   ByteStream output_; // the Reassembler writes to this ByteStream
+
+  // `buffer_` stores the substrings with ascending order in first_index
+  // substrings in `buffer_` is sure not to overlap
+  class SubString
+  {
+  public:
+    uint64_t first_index;
+    std::string data;
+  };
+  class Comparator
+  {
+  public:
+    bool operator()( const SubString& a, const SubString& b ) const { return a.first_index < b.first_index; };
+  };
+  std::set<SubString, Comparator> buffer_ {}; // set is tested to be nearly twice as fast as map
+  // std::map<uint64_t, std::string> buffer_ {};
+
+  uint64_t next_index_ = 0;
+  uint64_t bytes_pending_ = 0;
+
+  // when `is_last_substring` in `insert` is true, it means first_index + data.length()
+  // is the index of the last byte, and `last_byte_index` will be updated
+  uint64_t last_byte_index = -1;
 };
