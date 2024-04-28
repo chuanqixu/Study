@@ -10,6 +10,7 @@
 #include <memory>
 #include <optional>
 #include <queue>
+#include <utility>
 
 class TCPSender
 {
@@ -48,4 +49,22 @@ private:
   ByteStream input_;
   Wrap32 isn_;
   uint64_t initial_RTO_ms_;
+
+  // Timer and retransmission
+  bool timer_running_ { false };
+  uint64_t RTO_ms_ { 0 };
+  uint64_t time_ms_ { 0 };
+  uint64_t n_consecutive_retransmissions_ { 0 };
+
+  // Sender window
+  uint16_t window_size_ { 1 };
+
+  // Outstanding
+  std::queue<std::pair<uint64_t, TCPSenderMessage>>
+    outstanding_ {}; // first item is absolute sequence to received by ack
+  uint64_t sequence_numbers_in_flight_ { 0 };
+
+  // State
+  bool sent_syn_ { false };
+  bool sent_fin_ { false };
 };
