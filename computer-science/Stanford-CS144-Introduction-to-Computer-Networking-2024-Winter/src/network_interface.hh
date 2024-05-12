@@ -1,6 +1,8 @@
 #pragma once
 
 #include <queue>
+#include <unordered_map>
+#include <utility>
 
 #include "address.hh"
 #include "ethernet_frame.hh"
@@ -81,4 +83,14 @@ private:
 
   // Datagrams that have been received
   std::queue<InternetDatagram> datagrams_received_ {};
+
+  std::unordered_map<uint32_t, std::pair<EthernetAddress, size_t>> arp_table_ {};
+
+  // for each ip address, may need a vector to store all datagrams that need to be sent before knowing the MAC
+  // notice that in the lab, it does not require to resend the ARP request if there is no reply
+  // in my implementation, queue will be cleared when the first request for the same IP passed 5 seconds
+  // even though there may be several request for the same IP in the queue and the following requests were blocked
+  // because the reply is waiting and they did not pass 5 seconds
+  std::unordered_map<uint32_t, std::pair<std::queue<std::pair<InternetDatagram, Address>>, size_t>>
+    arp_waiting_table_ {};
 };
