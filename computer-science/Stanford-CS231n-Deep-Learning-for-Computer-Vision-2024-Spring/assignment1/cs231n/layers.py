@@ -28,7 +28,7 @@ def affine_forward(x, w, b):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    out = x.reshape(x.shape[0], -1) @ w + b
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -61,7 +61,9 @@ def affine_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    dx = (dout @ w.T).reshape(x.shape)
+    dw = x.reshape(x.shape[0], -1).T @ dout
+    db = np.sum(dout, axis =0)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -87,7 +89,17 @@ def relu_forward(x):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    out = x
+    # ------------------------
+    # Below can be directly written as this:
+    #  out[out < 0] = 0
+    # However, due to the implementation of eval_numerical_gradient_array,
+    # if ReLU is implemented like this, it will fail the test since this
+    # functin cannot generate the correct gradient
+    zeros = np.ones_like(out)
+    zeros[out < 0] = 0
+    out = out * zeros
+    # ------------------
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -114,7 +126,8 @@ def relu_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    dx = dout
+    dx[x < 0] = 0
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -773,7 +786,16 @@ def svm_loss(x, y):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_train = x.shape[0]
+    loss_matrix = x - x[np.arange(0, num_train), y].reshape(-1, 1) + 1
+    loss_matrix[np.arange(0, num_train), y] = 0
+    loss_matrix[loss_matrix < 0] = 0
+    loss = np.sum(loss_matrix) / num_train
+
+    dx = np.ones_like(x) / num_train
+    dx[loss_matrix <= 0] = 0 # equal to 0 is important since the gradient of 
+                             # the correct label should be 0
+    dx[np.arange(0, num_train), y] = -np.sum(dx, axis=1)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -803,7 +825,15 @@ def softmax_loss(x, y):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_train = x.shape[0]
+    scores = x - np.max(x, axis=1, keepdims=True)
+    exp_scores = np.exp(scores)
+    softmax = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
+    loss = -np.sum(np.log(softmax[np.arange(0, num_train), y])) / num_train
+
+    dx = softmax
+    dx[np.arange(0, num_train), y] -= 1
+    dx /= num_train
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
