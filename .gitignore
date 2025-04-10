@@ -11,4 +11,7 @@ computer-science/Stanford-CS106L-Standard-CPP-Programming-2020-Winter/**/build-*
 computer-science/Stanford-CS106L-Standard-CPP-Programming-2020-Winter/cpp_test*
 
 # Stanford CS231n
-computer-science/Stanford-CS231n-Deep-Learning-for-Computer-Vision-2024-Spring/assignment1/cs231n/datasets
+computer-science/Stanford-CS231n-Deep-Learning-for-Computer-Vision-2024-Spring/**/datasets
+computer-science/Stanford-CS231n-Deep-Learning-for-Computer-Vision-2024-Spring/**/build
+computer-science/Stanford-CS231n-Deep-Learning-for-Computer-Vision-2024-Spring/assignment2/cs231n/**.c
+computer-science/Stanford-CS231n-Deep-Learning-for-Computer-Vision-2024-Spring/assignment2/cs231n/**.so

@@ -74,7 +74,18 @@ class FullyConnectedNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        prev_dim = input_dim
+        for i, hidden_dim in enumerate(hidden_dims):
+          self.params[f"W{i + 1}"] = np.random.normal(0, weight_scale, size=(prev_dim, hidden_dim))
+          self.params[f"b{i + 1}"] = np.zeros(hidden_dim)
+          if normalization == "batchnorm":
+            self.params[f"gamma{i + 1}"] = np.ones(hidden_dim)
+            self.params[f"beta{i + 1}"] = np.zeros(hidden_dim)
+          prev_dim = hidden_dim
+        
+        # output layer
+        self.params[f"W{self.num_layers}"] = np.random.normal(0, weight_scale, size=(prev_dim, num_classes))
+        self.params[f"b{self.num_layers}"] = np.zeros(num_classes)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -148,7 +159,28 @@ class FullyConnectedNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        cache = {}
+        out = X.reshape(X.shape[0], -1)
+        for i in range(self.num_layers - 1):
+          out, cache_affine = affine_forward(out, self.params[f"W{i + 1}"], self.params[f"b{i + 1}"])
+          if self.normalization == "batchnorm":
+            out, cache_bn = batchnorm_forward(out, self.params[f"gamma{i + 1}"], self.params[f"beta{i + 1}"], self.bn_params[i])
+          out, cache_relu = relu_forward(out)
+          if self.use_dropout:
+            out, cache_dropout = dropout_forward(out, self.dropout_param)
+          if mode == "train":
+            cache[f"layer{i + 1}"] = {
+              "affine": cache_affine,
+              "relu": cache_relu
+            }
+            if self.normalization == "batchnorm":
+              cache[f"layer{i + 1}"]["batchnorm"] = cache_bn
+            if self.use_dropout:
+              cache[f"layer{i + 1}"]["dropout"] = cache_dropout
+  
+        scores, cache_affine = affine_forward(out, self.params[f"W{self.num_layers}"], self.params[f"b{self.num_layers}"])
+        if mode == "train":
+          cache[f"layer{self.num_layers}"] = {"affine": cache_affine}
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -171,11 +203,25 @@ class FullyConnectedNet(object):
         #                                                                          #
         # NOTE: To ensure that your implementation matches ours and you pass the   #
         # automated tests, make sure that your L2 regularization includes a factor #
-        # of 0.5 to simplify the expression for the gradient.                      #
+        # of 0.5 to simplify the expression for the gradie nt.                      #
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        loss, dout = softmax_loss(scores, y)
+        dx, dw, db = affine_backward(dout, cache[f"layer{self.num_layers}"]["affine"])
+        loss += self.reg / 2 * np.sum(self.params[f"W{self.num_layers}"] ** 2)
+        grads[f"W{self.num_layers}"] = dw + self.reg * self.params[f"W{self.num_layers}"]
+        grads[f"b{self.num_layers}"] = db
+        for i in range(self.num_layers - 1, 0, -1):
+          if self.use_dropout:
+            dx = dropout_backward(dx, cache[f"layer{i}"]["dropout"])
+          dx = relu_backward(dx, cache[f"layer{i}"]["relu"])
+          if self.normalization == "batchnorm":
+            dx, grads[f"gamma{i}"], grads[f"beta{i}"] = batchnorm_backward(dx, cache[f"layer{i}"]["batchnorm"])
+          dx, dw, db = affine_backward(dx, cache[f"layer{i}"]["affine"])
+          loss += self.reg / 2 * np.sum(self.params[f"W{i}"] ** 2)
+          grads[f"W{i}"] = dw + self.reg * self.params[f"W{i}"]
+          grads[f"b{i}"] = db
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
