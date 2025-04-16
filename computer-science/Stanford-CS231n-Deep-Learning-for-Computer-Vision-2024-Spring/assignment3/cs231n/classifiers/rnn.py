@@ -148,7 +148,23 @@ class CaptioningRNN:
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        if self.cell_type == "rnn":
+          forward_func = rnn_forward
+          backward_func = rnn_backward
+        elif self.cell_type == "lstm":
+          forward_func = lstm_forward
+          backward_func = lstm_backward
+
+        x, cache_embed = word_embedding_forward(captions_in, W_embed)
+        h0, cache_proj = affine_forward(features, W_proj, b_proj)
+        h, cache_forward = forward_func(x, h0, Wx, Wh, b)
+        scores, cache_ta = temporal_affine_forward(h, W_vocab, b_vocab)
+
+        loss, dout = temporal_softmax_loss(scores, captions_out, mask)
+        dh, grads["W_vocab"], grads["b_vocab"] = temporal_affine_backward(dout, cache_ta)
+        dx, dh0, grads["Wx"], grads["Wh"], grads["b"] = backward_func(dh, cache_forward)      
+        dfeatures, grads["W_proj"], grads["b_proj"] = affine_backward(dh0, cache_proj)
+        grads["W_embed"] = word_embedding_backward(dx, cache_embed)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -216,7 +232,21 @@ class CaptioningRNN:
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        words_idx = (np.ones((N, 1)) * self._start).astype("int")
+        h, cache = affine_forward(features, W_proj, b_proj)
+        c = np.zeros_like(h)
+        for i in range(max_length):
+          x, cache = word_embedding_forward(words_idx, W_embed)
+          x = x.reshape(N, -1)
+          if self.cell_type == "rnn":
+            h, cache = rnn_step_forward(x, h, Wx, Wh, b)
+          elif self.cell_type == "lstm":
+            h, c, cache = lstm_step_forward(x, h, c, Wx, Wh, b)
+          scores, cache = affine_forward(h, W_vocab, b_vocab)
+
+          words_idx = np.argmax(scores, axis=1, keepdims=True)
+          captions[:, i] = words_idx.reshape(-1)
+
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################

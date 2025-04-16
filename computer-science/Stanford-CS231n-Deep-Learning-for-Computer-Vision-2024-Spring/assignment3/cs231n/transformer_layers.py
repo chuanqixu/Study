@@ -38,7 +38,15 @@ class PositionalEncoding(nn.Module):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        pows_even = torch.arange(0, embed_dim / 2) * 2
+        pows_odd = torch.arange(0, (embed_dim - 1) / 2) * 2
+        pe[0, :, ::2] -= pows_even / embed_dim
+        pe[0, :, 1::2] -= pows_odd / embed_dim
+        pe = torch.pow(10000, pe)
+        rows = torch.arange(0, max_len).reshape(-1, 1)
+        pe[0] *= rows
+        pe[0, :, ::2] = torch.sin(pe[0, :, ::2])
+        pe[0, :, 1::2] = torch.cos(pe[0, :, 1::2])
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -70,7 +78,8 @@ class PositionalEncoding(nn.Module):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        output = x + self.pe[:, :S, :D]
+        output = self.dropout(output)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -165,7 +174,18 @@ class MultiHeadAttention(nn.Module):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        Q = self.query(query).reshape(N, S, self.n_head, self.head_dim).permute(0, 2, 1, 3)
+        K = self.key(key).reshape(N, T, self.n_head, self.head_dim).permute(0, 2, 1, 3)
+        V = self.value(value).reshape(N, T, self.n_head, self.head_dim).permute(0, 2, 1, 3)
+
+        alignments = Q @ K.permute(0, 1, 3, 2) / math.sqrt(self.head_dim)
+        if attn_mask is not None:
+          alignments = alignments.masked_fill(attn_mask == 0, float("-inf"))
+        weights = torch.softmax(alignments, dim=3)
+        weights = self.attn_drop(weights)
+
+        Y = (weights @ V).permute(0, 2, 1, 3).reshape(N, S, -1)
+        output = self.proj(Y)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
