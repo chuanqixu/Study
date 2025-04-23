@@ -116,7 +116,8 @@ def question_1d_sanity_check(model, src_sents, tgt_sents, vocab):
     # Configure for Testing
     reinitialize_layers(model)
     source_lengths = [len(s) for s in src_sents]
-    source_padded = model.vocab.src.to_input_tensor(src_sents, device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
+    # source_padded = model.vocab.src.to_input_tensor(src_sents, device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
+    source_padded = model.vocab.src.to_input_tensor(src_sents, device=model.device)
 
     # Load Outputs
     enc_hiddens_target = torch.load('./sanity_check_en_es_data/enc_hiddens.pkl')

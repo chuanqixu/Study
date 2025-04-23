@@ -8,3 +8,7 @@ Stanford CS 224N Natural Language Processing with Deep Learning Winter 2025 Assi
 # Assignment 2: Neural network foundations, calculating tensor derivatives, dependency parsing
 
 [Assignment 2 Handout](assignment2/handout.pdf)
+
+# Assignment 3: Neural Machine Translation with sequence-to-sequence, attention, and subwords
+
+[Assignment 3 Handout](assignment3/handout.pdf)
