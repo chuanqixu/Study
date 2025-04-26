@@ -12,3 +12,7 @@ Stanford CS 224N Natural Language Processing with Deep Learning Winter 2025 Assi
 # Assignment 3: Neural Machine Translation with sequence-to-sequence, attention, and subwords
 
 [Assignment 3 Handout](assignment3/handout.pdf)
+
+# Assignment 4: Self-supervised learning and fine-tuning with Transformers
+
+[Assignment 4 Handout](assignment4/handout.pdf)
