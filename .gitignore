@@ -24,3 +24,7 @@ computer-science/Stanford-CS224N-Natural-Language-Processing-with-Deep-Learning-
 computer-science/Stanford-CS224N-Natural-Language-Processing-with-Deep-Learning-2025-Winter/assignment4/expt
 computer-science/Stanford-CS224N-Natural-Language-Processing-with-Deep-Learning-2025-Winter/assignment4/*params
 computer-science/Stanford-CS224N-Natural-Language-Processing-with-Deep-Learning-2025-Winter/assignment4/*predictions
+
+# Berkeley CS285
+computer-science/Berkeley-CS285-Deep-Reinforcement-Learning/**/**.egg-info
+computer-science/Berkeley-CS285-Deep-Reinforcement-Learning/hw1/data/**
